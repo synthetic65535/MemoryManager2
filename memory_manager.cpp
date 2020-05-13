@@ -7,7 +7,7 @@
 //	Cluster
 //_________________________________________________________________________________
 
-//конструктор
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::Mini_Manager::Cluster::Cluster(int size, int elsize)
 {
 	cluster_size = size;
@@ -21,39 +21,39 @@ Multi_Manager_45::Mini_Manager::Cluster::Cluster(int size, int elsize)
 	prev_cluster = NULL;
 }
 
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::Mini_Manager::Cluster::~Cluster()
 {
 	free(mas);
 	free(stack);
 }
 
-//выделение памяти под 1 элемент
+//РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ 1 СЌР»РµРјРµРЅС‚
 void* Multi_Manager_45::Mini_Manager::Cluster::get_memory()
 {
-	if (head == 0) return NULL; //память кончилась
+	if (head == 0) return NULL; //РїР°РјСЏС‚СЊ РєРѕРЅС‡РёР»Р°СЃСЊ
 	head--;
 	free_space = head;
-	//берем из стека номер свободного элемента, и возвращаем указатель на него, из массива mas
+	//Р±РµСЂРµРј РёР· СЃС‚РµРєР° РЅРѕРјРµСЂ СЃРІРѕР±РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°, Рё РІРѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРµРіРѕ, РёР· РјР°СЃСЃРёРІР° mas
 	return (void*)(int(mas) + stack[head]*elem_size);
 }
 
-//принадлежит ли указатель кластеру
+//РїСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё СѓРєР°Р·Р°С‚РµР»СЊ РєР»Р°СЃС‚РµСЂСѓ
 bool Multi_Manager_45::Mini_Manager::Cluster::belong(void* element)
 {
-	int number; //номер элемента element в массиве mas
+	int number; //РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° element РІ РјР°СЃСЃРёРІРµ mas
 	number = (int(element) - int(mas)) / elem_size;
-	if (number < 0 || number > cluster_size-1) return false; //элемент не в нашем кластере
-	//если номер элемента находится в стеке свободных элементов, то повторно освобождать его нельзя
+	if (number < 0 || number > cluster_size-1) return false; //СЌР»РµРјРµРЅС‚ РЅРµ РІ РЅР°С€РµРј РєР»Р°СЃС‚РµСЂРµ
+	//РµСЃР»Рё РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РЅР°С…РѕРґРёС‚СЃСЏ РІ СЃС‚РµРєРµ СЃРІРѕР±РѕРґРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ, С‚Рѕ РїРѕРІС‚РѕСЂРЅРѕ РѕСЃРІРѕР±РѕР¶РґР°С‚СЊ РµРіРѕ РЅРµР»СЊР·СЏ
 	for (int i=0; i<head; i++) if (stack[i] == number) return false;
 	return true;
 }
 
-//освобождение памяти под 1 элемент
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ 1 СЌР»РµРјРµРЅС‚
 void Multi_Manager_45::Mini_Manager::Cluster::free_memory(void* element)
 {
-	int number; //номер элемента в массиве *mas
-	if (head == cluster_size) return; //в кластере нет элементов
+	int number; //РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° РІ РјР°СЃСЃРёРІРµ *mas
+	if (head == cluster_size) return; //РІ РєР»Р°СЃС‚РµСЂРµ РЅРµС‚ СЌР»РµРјРµРЅС‚РѕРІ
 	if (!belong(element)) return;
 	number = (int(element) - int(mas)) / elem_size;
 	stack[head++] = number;
@@ -64,7 +64,7 @@ void Multi_Manager_45::Mini_Manager::Cluster::free_memory(void* element)
 //	Memory_Manager
 //_________________________________________________________________________________
 
-//конструктор
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::Mini_Manager::Mini_Manager(int csize, int elsize)
 {
 	cluster_size = csize;
@@ -76,12 +76,12 @@ Multi_Manager_45::Mini_Manager::Mini_Manager(int csize, int elsize)
 	free_space = cluster_size;
 }
 
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::Mini_Manager::~Mini_Manager()
 {
-	Cluster *next; //можно использовать tail
+	Cluster *next; //РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ tail
 	current = head;
-	//удаляем список кластеров
+	//СѓРґР°Р»СЏРµРј СЃРїРёСЃРѕРє РєР»Р°СЃС‚РµСЂРѕРІ
 	while (current != NULL)
 	{
 		next = current->next_cluster;
@@ -90,16 +90,16 @@ Multi_Manager_45::Mini_Manager::~Mini_Manager()
 	}
 }
 
-//выделение памяти под 1 элемент
+//РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ 1 СЌР»РµРјРµРЅС‚
 void* Multi_Manager_45::Mini_Manager::get_memory()
 {
 	void *result;
 	//Cluster *temp;
-	//выделяем память из текущего кластера
+	//РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РёР· С‚РµРєСѓС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
 	result = current->get_memory();
 	free_space--;
-	//возможно кластер current заполнился. в таком случае
-	//нужно передвинуть указатель на следующий кластер, или выделить новый.
+	//РІРѕР·РјРѕР¶РЅРѕ РєР»Р°СЃС‚РµСЂ current Р·Р°РїРѕР»РЅРёР»СЃСЏ. РІ С‚Р°РєРѕРј СЃР»СѓС‡Р°Рµ
+	//РЅСѓР¶РЅРѕ РїРµСЂРµРґРІРёРЅСѓС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РєР»Р°СЃС‚РµСЂ, РёР»Рё РІС‹РґРµР»РёС‚СЊ РЅРѕРІС‹Р№.
 	while (current->free_space == 0)
 	{
 		if (current->next_cluster == NULL)
@@ -113,30 +113,30 @@ void* Multi_Manager_45::Mini_Manager::get_memory()
 	return result;
 }
 
-//освобождение памяти под 1 элемент
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ 1 СЌР»РµРјРµРЅС‚
 void Multi_Manager_45::Mini_Manager::free_memory(void* element)
 {
 	Cluster *temp, *found, *swap;
-	//освобождаем память в кластере found
+	//РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ РІ РєР»Р°СЃС‚РµСЂРµ found
 	found = head;
 	while ((found != NULL) && !(found->belong(element))) found = found->next_cluster;
-	if (found == NULL) return; //error, ссылка не в этом менеджере памяти
+	if (found == NULL) return; //error, СЃСЃС‹Р»РєР° РЅРµ РІ СЌС‚РѕРј РјРµРЅРµРґР¶РµСЂРµ РїР°РјСЏС‚Рё
 	found->free_memory(element);
 	free_space++;
-	//теперь он может стать легче, и всплыть вверх по списку.
+	//С‚РµРїРµСЂСЊ РѕРЅ РјРѕР¶РµС‚ СЃС‚Р°С‚СЊ Р»РµРіС‡Рµ, Рё РІСЃРїР»С‹С‚СЊ РІРІРµСЂС… РїРѕ СЃРїРёСЃРєСѓ.
 	temp = found;
 	while (temp->next_cluster != NULL && temp->next_cluster->free_space < found->free_space)
 		temp = temp->next_cluster;
-	//меняем местами temp и found (всего 8 ссылок)
-	//(!) возможно быстрее было бы поменять местами внутренности кластеров, а не указатели.
+	//РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё temp Рё found (РІСЃРµРіРѕ 8 СЃСЃС‹Р»РѕРє)
+	//(!) РІРѕР·РјРѕР¶РЅРѕ Р±С‹СЃС‚СЂРµРµ Р±С‹Р»Рѕ Р±С‹ РїРѕРјРµРЅСЏС‚СЊ РјРµСЃС‚Р°РјРё РІРЅСѓС‚СЂРµРЅРЅРѕСЃС‚Рё РєР»Р°СЃС‚РµСЂРѕРІ, Р° РЅРµ СѓРєР°Р·Р°С‚РµР»Рё.
 	if (temp != found)
 	{
-		//ссылки снаружи
+		//СЃСЃС‹Р»РєРё СЃРЅР°СЂСѓР¶Рё
 		if (found != head && found->prev_cluster != temp) found->prev_cluster->next_cluster = temp;
 		if (temp != head && temp->prev_cluster != found) temp->prev_cluster->next_cluster = found;
 		if (found != tail && found->next_cluster != temp) found->next_cluster->prev_cluster = temp;
 		if (temp != tail && temp->next_cluster != found) temp->next_cluster->prev_cluster = found;
-		//ссылки изнутри
+		//СЃСЃС‹Р»РєРё РёР·РЅСѓС‚СЂРё
 		//-----------
 		if (temp->prev_cluster == found)
 		{
@@ -170,18 +170,18 @@ void Multi_Manager_45::Mini_Manager::free_memory(void* element)
 		found->next_cluster = swap;
 		}
 		//-----------
-		//при необходимости переставляем голову и хвост
+		//РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‚Р°РІР»СЏРµРј РіРѕР»РѕРІСѓ Рё С…РІРѕСЃС‚
 		if (head == temp) head = found; else
 		if (head == found) head = temp;
 		if (tail == temp) tail = found; else
 		if (tail == found) tail = temp;
 		//
 	}
-	//нужно проверить не всплыл ли к нам тяжелый кластер т.е.
-	//возможно current уже не указывает на первый частично свободный кластер.
+	//РЅСѓР¶РЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ РЅРµ РІСЃРїР»С‹Р» Р»Рё Рє РЅР°Рј С‚СЏР¶РµР»С‹Р№ РєР»Р°СЃС‚РµСЂ С‚.Рµ.
+	//РІРѕР·РјРѕР¶РЅРѕ current СѓР¶Рµ РЅРµ СѓРєР°Р·С‹РІР°РµС‚ РЅР° РїРµСЂРІС‹Р№ С‡Р°СЃС‚РёС‡РЅРѕ СЃРІРѕР±РѕРґРЅС‹Р№ РєР»Р°СЃС‚РµСЂ.
 	if (current->prev_cluster != NULL && current->prev_cluster->free_space != 0) 
 		current = current->prev_cluster;
-	//освобождаем кластеры, если нужно
+	//РѕСЃРІРѕР±РѕР¶РґР°РµРј РєР»Р°СЃС‚РµСЂС‹, РµСЃР»Рё РЅСѓР¶РЅРѕ
 	if (tail->free_space == cluster_size && this->free_space == cluster_size*2/*!!!*/)
 	{
 		tail = tail->prev_cluster;
@@ -190,26 +190,26 @@ void Multi_Manager_45::Mini_Manager::free_memory(void* element)
 	}
 }
 
-//возвращает размер хранимых элементов
+//РІРѕР·РІСЂР°С‰Р°РµС‚ СЂР°Р·РјРµСЂ С…СЂР°РЅРёРјС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 int Multi_Manager_45::Mini_Manager::get_elem_size()
 {
 	return elem_size;
 }
 
- //освободился ли менеджер памяти
+ //РѕСЃРІРѕР±РѕРґРёР»СЃСЏ Р»Рё РјРµРЅРµРґР¶РµСЂ РїР°РјСЏС‚Рё
 bool Multi_Manager_45::Mini_Manager::is_empty()
 {
-	//если есть всего 1 кластер, и в нем ничего не хранится, то менеджер памяти пуст
+	//РµСЃР»Рё РµСЃС‚СЊ РІСЃРµРіРѕ 1 РєР»Р°СЃС‚РµСЂ, Рё РІ РЅРµРј РЅРёС‡РµРіРѕ РЅРµ С…СЂР°РЅРёС‚СЃСЏ, С‚Рѕ РјРµРЅРµРґР¶РµСЂ РїР°РјСЏС‚Рё РїСѓСЃС‚
 	return (head->next_cluster == NULL) && (head->free_space == cluster_size);
 	//
 }
 
-//принадлежит ли указатель этому менеджеру памяти
+//РїСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё СѓРєР°Р·Р°С‚РµР»СЊ СЌС‚РѕРјСѓ РјРµРЅРµРґР¶РµСЂСѓ РїР°РјСЏС‚Рё
 bool Multi_Manager_45::Mini_Manager::belong(void* element)
 {
 	Cluster *found;
 	found = head;
-	//ищем кластер, которому принадлежит элемент
+	//РёС‰РµРј РєР»Р°СЃС‚РµСЂ, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ СЌР»РµРјРµРЅС‚
 	while ((found != NULL) && !(found->belong(element))) found = found->next_cluster;
 	return (found != NULL);
 }
@@ -219,7 +219,7 @@ bool Multi_Manager_45::Mini_Manager::belong(void* element)
 //_________________________________________________________________________________
 
 
-//конструктор
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::Multi_Manager_45(int csize)
 {
 	//
@@ -229,10 +229,10 @@ Multi_Manager_45::Multi_Manager_45(int csize)
 	//
 }
 
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 Multi_Manager_45::~Multi_Manager_45()
 {
-	//уничтожение мини-менеджеров
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РјРёРЅРё-РјРµРЅРµРґР¶РµСЂРѕРІ
 	int i;
 	for (i=0; i<managers_count; i++)
 		delete managers[i];
@@ -241,7 +241,7 @@ Multi_Manager_45::~Multi_Manager_45()
 	//
 }
 
-//выделение памяти
+//РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё
 void* Multi_Manager_45::get_memory(int size)
 {
 	//
@@ -249,18 +249,18 @@ void* Multi_Manager_45::get_memory(int size)
 	int i,n;
 	//
 	found = false;
-	//ищем менеджер, который хранит элементы размера size
+	//РёС‰РµРј РјРµРЅРµРґР¶РµСЂ, РєРѕС‚РѕСЂС‹Р№ С…СЂР°РЅРёС‚ СЌР»РµРјРµРЅС‚С‹ СЂР°Р·РјРµСЂР° size
 	for (i=0; i<managers_count; i++)
 		if (managers[i]->get_elem_size() == size) 
 		{
 			found = true;
 			n = i;
 		}
-	//нашли менеджер, который хранит элементы такого размера
+	//РЅР°С€Р»Рё РјРµРЅРµРґР¶РµСЂ, РєРѕС‚РѕСЂС‹Р№ С…СЂР°РЅРёС‚ СЌР»РµРјРµРЅС‚С‹ С‚Р°РєРѕРіРѕ СЂР°Р·РјРµСЂР°
 	if (found) 
 		return managers[n]->get_memory(); 
 	else
-	{ 	//если не нашли, создаем такой менеджер
+	{ 	//РµСЃР»Рё РЅРµ РЅР°С€Р»Рё, СЃРѕР·РґР°РµРј С‚Р°РєРѕР№ РјРµРЅРµРґР¶РµСЂ
 		managers_count++;
 		if (managers == NULL)
 		managers = (Mini_Manager**)malloc(managers_count * sizeof(Mini_Manager*)); else
@@ -271,16 +271,16 @@ void* Multi_Manager_45::get_memory(int size)
 	//
 }
 
-//освобождение памяти
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
 void Multi_Manager_45::free_memory(void* element)
 {     
 	int i,j;
-	//ищем, какому менеджеру памяти принадлежит этот элемент
+	//РёС‰РµРј, РєР°РєРѕРјСѓ РјРµРЅРµРґР¶РµСЂСѓ РїР°РјСЏС‚Рё РїСЂРёРЅР°РґР»РµР¶РёС‚ СЌС‚РѕС‚ СЌР»РµРјРµРЅС‚
 	for (i=0; i<managers_count; i++)
 		if (managers[i]->belong(element))
 		{
 			managers[i]->free_memory(element);
-			if (managers[i]->is_empty()) //если менеджер памяти опустел - удаляем его
+			if (managers[i]->is_empty()) //РµСЃР»Рё РјРµРЅРµРґР¶РµСЂ РїР°РјСЏС‚Рё РѕРїСѓСЃС‚РµР» - СѓРґР°Р»СЏРµРј РµРіРѕ
 			{
 				//
 				delete managers[i];
